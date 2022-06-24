@@ -1,17 +1,47 @@
-import React from 'react';
-import ReactDOM from 'react-dom/client';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDOM from "react-dom/client";
+import { createStore } from "redux";
+import App from "./App";
+import { Provider } from "react-redux";
 
-const root = ReactDOM.createRoot(document.getElementById('root'));
+const initalState = {
+  array: [],
+};
+
+const reducer = (state = initalState, action) => {
+  switch (action.type) {
+    case "add":
+      return {
+        ...state,
+        array: [action.payload, ...state.array],
+      };
+    case "delete":
+      return {
+        ...state,
+        array: [
+          ...state.array.filter((text, index) => {
+            if (index !== action.payload.id) {
+              return true;
+            }
+          }),
+        ],
+      };
+
+    case "TaskCompleted":
+      return [...state].map((todo) =>
+        todo.id === action.id ? { ...todo, complited: !todo.complited } : todo
+      );
+    default:
+      return state;
+  }
+};
+
+const store = createStore(reducer);
+const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <App />
+    <Provider store={store}>
+      <App />
+    </Provider>
   </React.StrictMode>
 );
-
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
